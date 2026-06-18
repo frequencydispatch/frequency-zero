@@ -241,7 +241,11 @@
     <button class="chip" data-cmd="help">help</button>
     <button class="chip" data-cmd="about">about</button>
     <button class="chip" data-cmd="log">log</button>
-    <button class="chip" data-cmd="listen">listen</button>
+    <button class="chip" data-cmd="listen">listen</button><const audio = new Audio('inital contact.mp3');
+
+document.getElementById('listenBtn').addEventListener('click', () => {
+    audio.play();
+});>
     <button class="chip" data-cmd="decode">decode</button>
     <button class="chip" data-cmd="frequency">frequency</button>
   </div>
