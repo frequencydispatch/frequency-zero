@@ -241,11 +241,7 @@
     <button class="chip" data-cmd="help">help</button>
     <button class="chip" data-cmd="about">about</button>
     <button class="chip" data-cmd="log">log</button>
-    <button class="chip" data-cmd="listen">listen</button><const audio = new Audio('inital contact.mp3');
-
-document.getElementById('listenBtn').addEventListener('click', () => {
-    audio.play();
-});>
+    <button class="chip" data-cmd="listen">listen</button>
     <button class="chip" data-cmd="decode">decode</button>
     <button class="chip" data-cmd="frequency">frequency</button>
   </div>
@@ -626,10 +622,9 @@ document.getElementById('listenBtn').addEventListener('click', () => {
     appendLine('TYPE "help" FOR AVAILABLE COMMANDS.', 'dim');
   }
 
-  hiddenInput.addEventListener('input', () => {
+  hiddenInput.addEventListener('input', ()const audio = new Audio('initial contact.mp3'); => {
     typedText.textContent = hiddenInput.value;
   });
-
   hiddenInput.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
       e.preventDefault();
