@@ -1,7 +1,0 @@
-name = "frequency-zero"
-main = "messages.js"
-compatibility_date = "2024-01-01"
-
-[[kv_namespaces]]
-binding = "MESSAGES_KV"
-id = "2be2439a39b84be6b84bdae1f852acc9"
