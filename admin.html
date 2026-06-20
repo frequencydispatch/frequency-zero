@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NODE 0 // OPERATOR CONSOLE</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060907; --green:#3dff79; --green-soft:#9dffc0;
+    --green-dim:#1d6b3d; --green-faint:#0f3a22; --amber:#ffb000;
+    --glow: rgba(61,255,121,0.45);
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--green);
+    font-family:var(--mono); min-height:100vh; padding:20px;
+  }
+  h1{
+    font-size:1.1rem; letter-spacing:0.08em; margin:0 0 4px;
+    text-shadow:0 0 8px var(--glow);
+  }
+  .sub{color:var(--green-dim); font-size:0.78rem; margin-bottom:20px;}
+
+  .gate{
+    max-width:380px; margin:15vh auto 0;
+    border:1px solid var(--green-faint); padding:24px; border-radius:4px;
+  }
+  .gate input{
+    width:100%; background:transparent; border:1px solid var(--green-dim);
+    color:var(--green); font-family:var(--mono); padding:10px; margin:12px 0;
+    border-radius:2px; font-size:1rem;
+  }
+  .gate button, .console button{
+    background:transparent; border:1px solid var(--green);
+    color:var(--green); font-family:var(--mono); padding:9px 16px;
+    border-radius:2px; cursor:pointer; font-size:0.85rem; letter-spacing:0.04em;
+  }
+  .gate button:hover, .console button:hover{ background:var(--green-faint); }
+  .err{color:var(--amber); font-size:0.8rem; min-height:1.2em; margin-top:6px;}
+
+  .console{ display:none; max-width:760px; margin:0 auto; }
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .thread-list{ display:flex; flex-direction:column; gap:14px; }
+  .thread{
+    border:1px solid var(--green-faint); border-radius:4px; padding:14px;
+  }
+  .thread-header{
+    display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer; color:var(--green-soft); font-size:0.85rem; letter-spacing:0.03em;
+  }
+  .thread-count{ color:var(--green-dim); font-size:0.75rem; }
+  .messages{ margin-top:10px; display:none; flex-direction:column; gap:6px; }
+  .messages.open{ display:flex; }
+  .msg{ font-size:0.85rem; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+  .msg.visitor{ color:var(--green); }
+  .msg.operator{ color:var(--green-soft); font-style:italic; }
+  .msg .ts{ color:var(--green-dim); font-size:0.68rem; margin-right:6px; }
+  .reply-row{ display:flex; gap:8px; margin-top:10px; }
+  .reply-row textarea{
+    flex:1; background:transparent; border:1px solid var(--green-dim);
+    color:var(--green); font-family:var(--mono); padding:8px; border-radius:2px;
+    resize:vertical; min-height:40px; font-size:0.85rem;
+  }
+  .empty{ color:var(--green-dim); font-size:0.85rem; }
+  .status{ font-size:0.75rem; color:var(--green-dim); margin-left:10px; }
+</style>
+</head>
+<body>
+
+  <h1>NODE 0 // OPERATOR CONSOLE</h1>
+  <div class="sub">PRIVATE — DO NOT SHARE THIS URL</div>
+
+  <div class="gate" id="gate">
+    <div>ENTER ADMIN KEY</div>
+    <input type="password" id="keyInput" autocomplete="off" />
+    <button id="unlockBtn">UNLOCK</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+
+  <div class="console" id="console">
+    <div class="toolbar">
+      <span class="sub" style="margin:0;">ALL TRANSMISSIONS</span>
+      <button id="refreshBtn">REFRESH<span class="status" id="statusMsg"></span></button>
+    </div>
+    <div class="thread-list" id="threadList"></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  const gate = document.getElementById('gate');
+  const consoleEl = document.getElementById('console');
+  const keyInput = document.getElementById('keyInput');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const gateErr = document.getElementById('gateErr');
+  const threadList = document.getElementById('threadList');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const statusMsg = document.getElementById('statusMsg');
+
+  let adminKey = sessionStorage.getItem('fz_admin_key') || '';
+
+  function setStatus(text){
+    statusMsg.textContent = text ? ' — '+text : '';
+  }
+
+  async function loadThreads(){
+    setStatus('loading...');
+    try{
+      const res = await fetch('/api/admin', { headers: { 'x-admin-key': adminKey } });
+      if(res.status === 401){
+        sessionStorage.removeItem('fz_admin_key');
+        adminKey = '';
+        gate.style.display = 'block';
+        consoleEl.style.display = 'none';
+        gateErr.textContent = 'INVALID KEY.';
+        setStatus('');
+        return;
+      }
+      if(!res.ok){
+        const err = await res.json().catch(()=>({error:'unknown error'}));
+        setStatus('ERROR: '+(err.error || res.status));
+        return;
+      }
+      const data = await res.json();
+      renderThreads(data.threads || {});
+      setStatus('updated '+new Date().toLocaleTimeString());
+    }catch(e){
+      setStatus('NO CONNECTION');
+    }
+  }
+
+  function renderThreads(threads){
+    const callsigns = Object.keys(threads).sort((a,b)=>{
+      const lastA = threads[a].length ? threads[a][threads[a].length-1].ts : 0;
+      const lastB = threads[b].length ? threads[b][threads[b].length-1].ts : 0;
+      return lastB - lastA;
+    });
+
+    if(callsigns.length === 0){
+      threadList.innerHTML = '<div class="empty">NO TRANSMISSIONS RECEIVED YET.</div>';
+      return;
+    }
+
+    threadList.innerHTML = '';
+    callsigns.forEach(callsign=>{
+      const msgs = threads[callsign];
+      const wrap = document.createElement('div');
+      wrap.className = 'thread';
+
+      const header = document.createElement('div');
+      header.className = 'thread-header';
+      header.innerHTML = '<span>' + callsign.toUpperCase() + '</span><span class="thread-count">' + msgs.length + ' msg' + (msgs.length===1?'':'s') + '</span>';
+
+      const msgWrap = document.createElement('div');
+      msgWrap.className = 'messages';
+
+      msgs.forEach(m=>{
+        const line = document.createElement('div');
+        line.className = 'msg ' + (m.from === 'operator' ? 'operator' : 'visitor');
+        const time = m.ts ? new Date(m.ts).toLocaleString() : '';
+        line.innerHTML = '<span class="ts">'+time+'</span>' + (m.from === 'operator' ? 'NODE 0: ' : callsign.toUpperCase()+': ') + escapeHtml(m.text);
+        msgWrap.appendChild(line);
+      });
+
+      const replyRow = document.createElement('div');
+      replyRow.className = 'reply-row';
+      const textarea = document.createElement('textarea');
+      textarea.placeholder = 'Reply as NODE 0...';
+      const sendBtn = document.createElement('button');
+      sendBtn.textContent = 'SEND';
+      sendBtn.addEventListener('click', async ()=>{
+        const text = textarea.value.trim();
+        if(!text) return;
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'SENDING...';
+        try{
+          const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+            body: JSON.stringify({ callsign, text })
+          });
+          if(res.ok){
+            textarea.value = '';
+            await loadThreads();
+          } else {
+            const err = await res.json().catch(()=>({error:'unknown error'}));
+            alert('Failed to send: ' + (err.error || res.status));
+          }
+        }catch(e){
+          alert('Failed to send: no connection');
+        }
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'SEND';
+      });
+      replyRow.appendChild(textarea);
+      replyRow.appendChild(sendBtn);
+
+      header.addEventListener('click', ()=>{
+        msgWrap.classList.toggle('open');
+      });
+
+      wrap.appendChild(header);
+      wrap.appendChild(msgWrap);
+      msgWrap.appendChild(replyRow);
+      threadList.appendChild(wrap);
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function unlock(){
+    const val = keyInput.value;
+    if(!val){ gateErr.textContent = 'ENTER A KEY.'; return; }
+    adminKey = val;
+    sessionStorage.setItem('fz_admin_key', adminKey);
+    gateErr.textContent = '';
+    gate.style.display = 'none';
+    consoleEl.style.display = 'block';
+    loadThreads();
+  }
+
+  unlockBtn.addEventListener('click', unlock);
+  keyInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') unlock(); });
+  refreshBtn.addEventListener('click', loadThreads);
+
+  if(adminKey){
+    gate.style.display = 'none';
+    consoleEl.style.display = 'block';
+    loadThreads();
+  }
+})();
+</script>
+</body>
+</html>

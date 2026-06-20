@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>FREQUENCY ZERO // ARCHIVE TERMINAL</title>
+<meta name="description" content="Frequency Zero — archive terminal for a discontinued shortwave relay network. Access restricted. Node 0 listening only." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060907;
+    --bg-alt:#0b1210;
+    --green:#3dff79;
+    --green-soft:#9dffc0;
+    --green-dim:#1d6b3d;
+    --green-faint:#0f3a22;
+    --amber:#ffb000;
+    --glow: rgba(61,255,121,0.45);
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    --pixel: 'VT323', monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--green);
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+    font-family:var(--mono);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- atmosphere ---------- */
+  .crt-layer{
+    position:fixed; inset:0; pointer-events:none; z-index:30;
+  }
+  .crt-scanlines{
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,20,8,0.35) 3px,
+      rgba(0,0,0,0) 4px
+    );
+    mix-blend-mode:multiply;
+    opacity:0.55;
+  }
+  .crt-vignette{
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%);
+  }
+  .crt-noise{
+    opacity:0.05;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .crt-flicker{
+    animation:flicker 7s infinite linear;
+    background:rgba(61,255,121,0.02);
+  }
+  @keyframes flicker{
+    0%,92%,100%{opacity:0;}
+    93%{opacity:1;}
+    94%{opacity:0;}
+    96%{opacity:0.6;}
+    97%{opacity:0;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .crt-flicker{animation:none; opacity:0;}
+  }
+
+  /* ---------- layout ---------- */
+  .terminal{
+    position:relative; z-index:10;
+    display:flex; flex-direction:column;
+    height:100vh; height:100dvh;
+    max-width:980px; margin:0 auto;
+    padding:0 clamp(10px,3vw,28px);
+  }
+
+  .statusbar{
+    flex:none;
+    display:flex; flex-wrap:wrap; gap:6px 16px;
+    align-items:baseline;
+    justify-content:space-between;
+    padding:10px 0 8px;
+    border-bottom:1px solid var(--green-faint);
+    font-size:clamp(0.62rem,1.8vw,0.78rem);
+    letter-spacing:0.04em;
+    color:var(--green-dim);
+    text-shadow:0 0 6px var(--glow);
+  }
+  .statusbar strong{color:var(--green); font-weight:500;}
+  .statusbar .sig{color:var(--green-soft);}
+
+  .titleblock{
+    flex:none;
+    padding:18px 0 6px;
+    font-family:var(--pixel);
+    line-height:1.05;
+  }
+  .titleblock h1{
+    margin:0;
+    font-family:var(--pixel);
+    font-weight:400;
+    font-size:clamp(1.9rem,8vw,3.4rem);
+    letter-spacing:0.06em;
+    color:var(--green);
+    text-shadow:0 0 12px var(--glow), 0 0 2px var(--green);
+  }
+  .titleblock p{
+    margin:2px 0 0;
+    font-family:var(--mono);
+    font-size:clamp(0.66rem,2vw,0.82rem);
+    color:var(--green-dim);
+    letter-spacing:0.08em;
+  }
+
+  .output{
+    flex:1 1 auto;
+    overflow-y:auto;
+    padding:10px 0 6px;
+    font-size:clamp(0.78rem,2.1vw,0.95rem);
+    line-height:1.5;
+    scrollbar-width:thin;
+    scrollbar-color:var(--green-dim) transparent;
+  }
+  .output::-webkit-scrollbar{width:6px;}
+  .output::-webkit-scrollbar-thumb{background:var(--green-faint); border-radius:3px;}
+
+  .line{margin:0 0 2px; white-space:pre-wrap; word-break:break-word;}
+  .line.system{color:var(--green-dim);}
+  .line.echo{color:var(--green-soft); font-weight:500;}
+  .line.quote{color:var(--green-soft); font-style:italic;}
+  .line.warn{color:var(--amber);}
+  .line.dim{color:var(--green-dim); opacity:0.85;}
+  .line.glow{text-shadow:0 0 8px var(--glow);}
+
+  .chips{
+    flex:none;
+    display:flex; flex-wrap:wrap; gap:6px;
+    padding:8px 0;
+    border-top:1px dashed var(--green-faint);
+  }
+  .chip{
+    background:transparent;
+    border:1px solid var(--green-dim);
+    color:var(--green-dim);
+    font-family:var(--mono);
+    font-size:0.72rem;
+    letter-spacing:0.05em;
+    padding:5px 10px;
+    border-radius:2px;
+    cursor:pointer;
+    transition:border-color 0.15s, color 0.15s;
+  }
+  .chip:hover, .chip:focus-visible{
+    border-color:var(--green);
+    color:var(--green);
+  }
+
+  .prompt-line{
+    flex:none;
+    display:flex; align-items:center; gap:8px;
+    padding:10px 0 16px;
+    font-size:clamp(0.82rem,2.2vw,1rem);
+    position:relative;
+  }
+  .prompt-label{color:var(--green-soft); flex:none; text-shadow:0 0 6px var(--glow);}
+  .typed-wrap{flex:1; min-width:0; display:flex; align-items:center; white-space:pre;}
+  .typed-text{color:var(--green); word-break:break-all;}
+  .cursor-block{
+    display:inline-block;
+    width:0.55em; height:1.05em;
+    background:var(--green);
+    margin-left:2px;
+    box-shadow:0 0 8px var(--glow);
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{0%,49%{opacity:1;} 50%,100%{opacity:0;}}
+  @media (prefers-reduced-motion: reduce){
+    .cursor-block{animation:none; opacity:1;}
+  }
+
+  .hidden-input{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    opacity:0; border:none; outline:none;
+    background:transparent; color:transparent;
+    caret-color:transparent;
+    font-size:16px; /* prevents mobile zoom on focus */
+    padding:0; margin:0;
+  }
+  .prompt-line:focus-within{
+    outline:1px solid var(--green-faint);
+    outline-offset:4px;
+  }
+
+  noscript{
+    position:fixed; inset:0; z-index:50;
+    background:#060907; color:#3dff79;
+    display:flex; align-items:center; justify-content:center;
+    font-family:monospace; text-align:center; padding:24px;
+  }
+
+  @media (max-width:420px){
+    .statusbar{font-size:0.6rem; gap:4px 10px;}
+    .titleblock{padding:12px 0 4px;}
+  }
+</style>
+</head>
+<body>
+
+<noscript>NODE 0 REQUIRES AN ACTIVE TERMINAL SESSION (JAVASCRIPT DISABLED). ENABLE JAVASCRIPT TO ACCESS THE ARCHIVE.</noscript>
+
+<audio id="initialContact" src="initial%20contact.mp3" preload="auto"></audio>
+<audio id="signalAudio" src="signal.mp3" preload="auto"></audio>
+<audio id="logAudio" src="log.mp3" preload="auto"></audio>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="terminal">
+
+  <div class="statusbar" aria-hidden="true">
+    <span><strong>NODE&nbsp;0</strong> // FREQUENCY ZERO ARCHIVE</span>
+    <span class="sig" id="sigBars">▃▅▇█▆▄▂</span>
+    <span id="clock">00:00:00</span>
+    <span>UPTIME <span id="uptime">00:00:00</span></span>
+  </div>
+
+  <div class="titleblock">
+    <h1>FREQUENCY ZERO</h1>
+    <p>ARCHIVE TERMINAL — UNLICENSED RELAY, DECOMMISSIONED 2009</p>
+  </div>
+
+  <div class="output" id="output" role="log" aria-live="polite" aria-label="terminal output"></div>
+
+  <div class="chips" aria-label="quick commands">
+    <button class="chip" data-cmd="help">help</button>
+    <button class="chip" data-cmd="about">about</button>
+    <button class="chip" data-cmd="log">log</button>
+    <button class="chip" data-cmd="listen">listen</button>
+    <button class="chip" data-cmd="decode">decode</button>
+    <button class="chip" data-cmd="frequency">frequency</button>
+    <button class="chip" data-cmd="transmit " data-prefill="true">transmit</button>
+    <button class="chip" data-cmd="inbox">inbox</button>
+  </div>
+
+  <div class="prompt-line" id="promptLine">
+    <span class="prompt-label">user@freq0:~$</span>
+    <span class="typed-wrap"><span class="typed-text" id="typedText"></span><span class="cursor-block"></span></span>
+    <input id="hiddenInput" class="hidden-input" type="text" aria-label="terminal command input"
+      autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const output = document.getElementById('output');
+  const typedText = document.getElementById('typedText');
+  const hiddenInput = document.getElementById('hiddenInput');
+  const promptLine = document.getElementById('promptLine');
+  const sigBars = document.getElementById('sigBars');
+  const clockEl = document.getElementById('clock');
+  const uptimeEl = document.getElementById('uptime');
+
+  /* ---------------- live status bar ---------------- */
+  const bootedAt = Date.now();
+  function pad(n){ return n.toString().padStart(2,'0'); }
+  function tickClock(){
+    const now = new Date();
+    clockEl.textContent = pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+    const up = Math.floor((Date.now()-bootedAt)/1000);
+    uptimeEl.textContent = pad(Math.floor(up/3600))+':'+pad(Math.floor((up%3600)/60))+':'+pad(up%60);
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  if(!reduceMotion){
+    const bars = ['▁','▂','▃','▄','▅','▆','▇','█'];
+    setInterval(()=>{
+      let s='';
+      for(let i=0;i<7;i++) s += bars[Math.floor(Math.random()*bars.length)];
+      sigBars.textContent = s;
+    }, 1400);
+  }
+
+  /* ---------------- output helpers ---------------- */
+  function appendLine(text, cls){
+    const div = document.createElement('div');
+    div.className = 'line' + (cls ? ' '+cls : '');
+    div.textContent = text;
+    output.appendChild(div);
+    output.scrollTop = output.scrollHeight;
+    return div;
+  }
+
+  function printLines(lines, opts){
+    opts = opts || {};
+    const stagger = reduceMotion ? 0 : (opts.stagger || 0);
+    if(stagger <= 0){
+      lines.forEach(l => appendLine(l.text !== undefined ? l.text : l, l.cls));
+      return Promise.resolve();
+    }
+    return new Promise(resolve=>{
+      let i = 0;
+      function next(){
+        if(i >= lines.length){ resolve(); return; }
+        const l = lines[i];
+        appendLine(l.text !== undefined ? l.text : l, l.cls);
+        i++;
+        setTimeout(next, stagger);
+      }
+      next();
+    });
+  }
+
+  function clearOutput(){
+    output.innerHTML = '';
+  }
+
+  /* ---------------- initial contact audio ---------------- */
+  const initialContact = document.getElementById('initialContact');
+  function tryPlayInitialContact(){
+    const p = initialContact.play();
+    if(p && typeof p.catch === 'function'){
+      p.catch(()=>{
+        const retry = () => {
+          initialContact.play().catch(()=>{});
+        };
+        document.addEventListener('click', retry, {once:true});
+        document.addEventListener('keydown', retry, {once:true});
+        document.addEventListener('touchstart', retry, {once:true});
+      });
+    }
+  }
+  tryPlayInitialContact();
+
+  /* ---------------- boot sequence ---------------- */
+  const bootLines = [
+    {text:'INITIALIZING NODE 0 TERMINAL...', cls:'system'},
+    {text:'CARRIER DETECTED ON LEGACY BAND...', cls:'system'},
+    {text:'ESTABLISHING UPLINK...', cls:'system'},
+    {text:'DECRYPTING ARCHIVE INDEX... DONE', cls:'system'},
+    {text:'WELCOME TO FREQUENCY ZERO ARCHIVE TERMINAL — BUILD 0.4.7', cls:'glow'},
+    {text:'LAST TRANSMISSION RECEIVED: 6055 DAYS AGO', cls:'dim'},
+    {text:'27 LOGGED EVENTS — 7 RECOVERED — 18 SEALED OR CORRUPTED', cls:'dim'},
+    {text:'TYPE "help" TO BEGIN', cls:''}
+  ];
+
+  function typeBootLine(line){
+    return new Promise(resolve=>{
+      const div = document.createElement('div');
+      div.className = 'line' + (line.cls ? ' '+line.cls : '');
+      output.appendChild(div);
+      if(reduceMotion){
+        div.textContent = line.text;
+        output.scrollTop = output.scrollHeight;
+        resolve();
+        return;
+      }
+      let i = 0;
+      const text = line.text;
+      (function step(){
+        div.textContent = text.slice(0, i);
+        output.scrollTop = output.scrollHeight;
+        i++;
+        if(i <= text.length){
+          setTimeout(step, 14 + Math.random()*18);
+        } else {
+          resolve();
+        }
+      })();
+    });
+  }
+
+  async function runBoot(){
+    for(const line of bootLines){
+      await typeBootLine(line);
+      await new Promise(r=>setTimeout(r, reduceMotion ? 0 : 90));
+    }
+    hiddenInput.focus({preventScroll:true});
+  }
+
+  /* ---------------- archive data ---------------- */
+  const LOGS = [
+    {id:'0001', date:'1991-03-14', freq:'6855 kHz', dur:'00:42', status:'RECOVERED',
+      line:'"the third room has no door"',
+      raw:'14 22 09 — 41 41 02 — 17 17 30',
+      partial:'T H E   T H I R D   R O O M   H A S   N O   D O O R'},
+    {id:'0002', date:'1994-11-02', freq:'4625 kHz', dur:'02:17', status:'CORRUPTED',
+      line:'[transcript unreadable beyond opening numerals]',
+      raw:'05 05 12 — ?? ?? ?? — ?? ?? ??',
+      partial:'0 5 0 5 1 2 _ _ _ _ _ _ _ _ _'},
+    {id:'0003', date:'1999-07-09', freq:'9043 kHz', dur:'00:08', status:'RECOVERED',
+      line:'"she counted backward and did not stop"',
+      raw:'09 08 07 — 06 05 04 — 03 02 01 — 00 ??',
+      partial:'S H E   C O U N T E D   B A C K W A R D'},
+    {id:'0004', date:'2001-02-28', freq:'6855 kHz', dur:'11:03', status:'SEALED',
+      line:'[access restricted — clearance NODE 0 only]',
+      raw:'[REDACTED]',
+      partial:'[REDACTED]'},
+    {id:'0005', date:'2003-09-17', freq:'4625 kHz', dur:'00:55', status:'RECOVERED',
+      line:'"the relay remembers what the operator forgot"',
+      raw:'18 03 22 — 14 09 11 — 27 27 27',
+      partial:'T H E   R E L A Y   R E M E M B E R S'},
+    {id:'0006', date:'2006-12-01', freq:'7039 kHz', dur:'00:23', status:'CORRUPTED',
+      line:'[signal lost mid-transmission]',
+      raw:'31 ?? 19 — ?? ?? 02',
+      partial:'_ _ _   S T O P   _ _ _'},
+    {id:'0007', date:'2009-04-30', freq:'6855 kHz', dur:'00:01', status:'FINAL TRANSMISSION',
+      line:'"do not retune past zero"',
+      raw:'00 00 00 00 00',
+      partial:'D O   N O T   R E T U N E'}
+  ];
+
+  /* ---------------- audio: synthesized signal burst ---------------- */
+  let audioCtx = null;
+  function ensureAudio(){
+    try{
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+      return true;
+    }catch(e){ return false; }
+  }
+  function beep(freq, start, dur, gainVal){
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const t0 = audioCtx.currentTime + start;
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(gainVal, t0 + 0.012);
+    gain.gain.linearRampToValueAtTime(0, t0 + dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.03);
+  }
+  function playSignalBurst(){
+    if(!ensureAudio()) return false;
+    const pattern = [880,740,660,880,520,880,440,660,520];
+    let t = 0;
+    pattern.forEach((f,i)=>{
+      beep(f, t, 0.11, 0.045);
+      t += 0.17 + (i % 3 === 0 ? 0.14 : 0);
+    });
+    beep(96, 0, t + 0.2, 0.018);
+    return true;
+  }
+
+  function asciiWaveform(durationMs){
+    return new Promise(resolve=>{
+      const div = appendLine('', 'dim');
+      if(reduceMotion){
+        div.textContent = '▁▃▅▇█▇▅▃▁▃▅▇█▅▃▁';
+        resolve();
+        return;
+      }
+      const chars = ['▁','▂','▃','▄','▅','▆','▇','█'];
+      const start = Date.now();
+      (function frame(){
+        let s = '';
+        for(let i=0;i<16;i++) s += chars[Math.floor(Math.random()*chars.length)];
+        div.textContent = s;
+        if(Date.now() - start < durationMs){
+          setTimeout(frame, 90);
+        } else {
+          div.textContent = '▁▂▁▂▁▂▁▂▁▂▁▂▁▂▁▂';
+          resolve();
+        }
+      })();
+    });
+  }
+
+  /* ---------------- commands ---------------- */
+  const unknownReplies = [
+    'COMMAND NOT RECOGNIZED. SIGNAL UNCLEAR.',
+    'NO SUCH TRANSMISSION PROTOCOL.',
+    'STATIC. TRY AGAIN.',
+    'NODE 0 DOES NOT UNDERSTAND.'
+  ];
+
+  function logIndexLines(){
+    const out = [{text:'TRANSMISSION ARCHIVE INDEX', cls:'glow'}, {text:'', cls:''}];
+    LOGS.forEach(l=>{
+      out.push({text: l.id+' | '+l.date+' | '+l.freq+' | '+l.dur+' | '+l.status, cls:''});
+    });
+    out.push({text:'', cls:''});
+    out.push({text:'TYPE "log <id>" FOR DETAIL, OR "decode <id>" TO ATTEMPT RECOVERY.', cls:'dim'});
+    return out;
+  }
+
+  function logDetailLines(id){
+    const entry = LOGS.find(l => l.id === id || l.id === '0'.repeat(4-String(id).length)+id);
+    if(!entry) return [{text:'NO MATCHING LOG ENTRY FOR "'+id+'".', cls:'warn'}];
+    return [
+      {text:'LOG '+entry.id, cls:'glow'},
+      {text:'DATE: '+entry.date, cls:'dim'},
+      {text:'FREQUENCY: '+entry.freq, cls:'dim'},
+      {text:'DURATION: '+entry.dur, cls:'dim'},
+      {text:'STATUS: '+entry.status, cls:'dim'},
+      {text:entry.line, cls:'quote'}
+    ];
+  }
+
+  function decodeLines(id){
+    let entry;
+    if(id){
+      entry = LOGS.find(l => l.id === id || l.id === '0'.repeat(4-String(id).length)+id);
+      if(!entry) return [{text:'NO MATCHING LOG ENTRY FOR "'+id+'".', cls:'warn'}];
+    } else {
+      entry = LOGS[Math.floor(Math.random()*LOGS.length)];
+    }
+    const lines = [
+      {text:'ATTEMPTING DECRYPTION OF LOG '+entry.id+'...', cls:'system'},
+      {text:'RAW: '+entry.raw, cls:'dim'},
+      {text:'PARTIAL DECODE: '+entry.partial, cls:''}
+    ];
+    if(entry.status === 'RECOVERED' || entry.status === 'FINAL TRANSMISSION'){
+      lines.push({text:'DECRYPTION COMPLETE.', cls:'glow'});
+      lines.push({text:entry.line, cls:'quote'});
+    } else if(entry.status === 'SEALED'){
+      lines.push({text:'DECRYPTION DENIED — CLEARANCE REQUIRED.', cls:'warn'});
+    } else {
+      lines.push({text:'DECRYPTION INCOMPLETE — KEY FRAGMENT MISSING.', cls:'warn'});
+    }
+    return lines;
+  }
+
+  const signalAudio = document.getElementById('signalAudio');
+  const logAudio = document.getElementById('logAudio');
+
+  async function runListen(){
+    appendLine('TUNING TO LAST KNOWN CARRIER...', 'system');
+    let playedReal = false;
+    try{
+      signalAudio.currentTime = 0;
+      await signalAudio.play();
+      playedReal = true;
+    }catch(e){
+      playedReal = false;
+    }
+
+    if(playedReal){
+      appendLine('[AUDIO: SIGNAL BURST DETECTED]', 'dim');
+      const dur = (isFinite(signalAudio.duration) && signalAudio.duration > 0)
+        ? signalAudio.duration * 1000
+        : 1700;
+      await asciiWaveform(Math.min(dur, 8000));
+    } else {
+      const played = playSignalBurst();
+      appendLine(played ? '[AUDIO: SIGNAL BURST DETECTED]' : '[AUDIO UNAVAILABLE — VISUAL TRACE ONLY]', 'dim');
+      await asciiWaveform(1700);
+    }
+    appendLine('BURST ENDED. NO VOICE PATTERN MATCHED.', 'dim');
+  }
+
+  async function runZeroEasterEgg(){
+    const reveal = [
+      {text:'...', cls:'dim'},
+      {text:'[LONG PAUSE]', cls:'dim'},
+      {text:'', cls:''},
+      {text:'YOU ARE FREQUENCY ZERO.', cls:'warn'},
+      {text:'', cls:''},
+      {text:'THE NETWORK WAS NEVER BROADCASTING.', cls:'glow'},
+      {text:'IT WAS LISTENING.', cls:'glow'},
+      {text:'', cls:''},
+      {text:'[CONNECTION STABLE]', cls:'dim'}
+    ];
+    await printLines(reveal, {stagger: 550});
+  }
+
+  /* ---------------- operator messaging (transmit / inbox) ---------------- */
+  const API_BASE = '/api/messages';
+  const CALLSIGN_KEY = 'fz_callsign';
+
+  function generateCallsign(){
+    const words = ['ECHO','DRIFT','RELAY','STATIC','HOLLOW','ANALOG','CIPHER','VESSEL','SIGNAL','EMBER'];
+    const w = words[Math.floor(Math.random()*words.length)];
+    const n = Math.floor(1000 + Math.random()*8999);
+    return (w+'-'+n).toLowerCase();
+  }
+
+  function getCallsign(){
+    let c = localStorage.getItem(CALLSIGN_KEY);
+    if(!c){
+      c = generateCallsign();
+      localStorage.setItem(CALLSIGN_KEY, c);
+    }
+    return c;
+  }
+
+  function setCallsign(name){
+    const cleaned = name.trim().toLowerCase().replace(/[^a-z0-9\-_]/g,'').slice(0,32);
+    if(!cleaned) return null;
+    localStorage.setItem(CALLSIGN_KEY, cleaned);
+    return cleaned;
+  }
+
+  async function runTransmit(messageText){
+    if(!messageText || !messageText.trim()){
+      printLines([{text:'USAGE: transmit <message>', cls:'warn'}]);
+      return;
+    }
+    const callsign = getCallsign();
+    appendLine('ENCODING TRANSMISSION...', 'system');
+    try{
+      const res = await fetch(API_BASE, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ callsign, text: messageText.trim() })
+      });
+      if(!res.ok){
+        const err = await res.json().catch(()=>({error:'unknown error'}));
+        appendLine('TRANSMISSION FAILED: '+(err.error || res.status), 'warn');
+        return;
+      }
+      appendLine('TRANSMISSION SENT UNDER CALLSIGN "'+callsign+'".', 'glow');
+      appendLine('NODE 0 MAY RESPOND. CHECK BACK WITH "inbox".', 'dim');
+    }catch(e){
+      appendLine('TRANSMISSION FAILED: NO UPLINK.', 'warn');
+    }
+  }
+
+  async function runInbox(){
+    const callsign = getCallsign();
+    appendLine('CHECKING ARCHIVE FOR CALLSIGN "'+callsign+'"...', 'system');
+    try{
+      const res = await fetch(API_BASE+'?callsign='+encodeURIComponent(callsign));
+      if(!res.ok){
+        const err = await res.json().catch(()=>({error:'unknown error'}));
+        appendLine('INBOX CHECK FAILED: '+(err.error || res.status), 'warn');
+        return;
+      }
+      const data = await res.json();
+      const thread = data.thread || [];
+      if(thread.length === 0){
+        appendLine('NO TRANSMISSIONS ON RECORD. TYPE "transmit <message>" TO BEGIN.', 'dim');
+        return;
+      }
+      thread.forEach(m=>{
+        const tag = m.from === 'operator' ? 'NODE 0' : callsign.toUpperCase();
+        const cls = m.from === 'operator' ? 'quote' : '';
+        appendLine(tag+': '+m.text, cls);
+      });
+    }catch(e){
+      appendLine('INBOX CHECK FAILED: NO UPLINK.', 'warn');
+    }
+  }
+
+  const commands = {
+    help: () => [
+      {text:'AVAILABLE COMMANDS:', cls:'glow'},
+      {text:'  about            -- network history', cls:''},
+      {text:'  log [id]         -- transmission archive index, or one entry', cls:''},
+      {text:'  decode [id]      -- attempt decryption of a logged transmission', cls:''},
+      {text:'  listen           -- play recovered signal burst', cls:''},
+      {text:'  frequency        -- current lock status', cls:''},
+      {text:'  whoami           -- operator identity check', cls:''},
+      {text:'  callsign [name]  -- show or set your operator callsign', cls:''},
+      {text:'  transmit <msg>   -- send a message into the archive', cls:''},
+      {text:'  inbox            -- check for a reply from NODE 0', cls:''},
+      {text:'  clear            -- clear terminal output', cls:''},
+      {text:'  help             -- this list', cls:''}
+    ],
+    about: () => [
+      {text:'FREQUENCY ZERO', cls:'glow'},
+      {text:'An unregistered shortwave relay believed to have operated between', cls:''},
+      {text:'1987 and 2009 from a fixed transmission point never publicly identified.', cls:''},
+      {text:'Unlike known numbers stations, its broadcasts followed no fixed schedule', cls:''},
+      {text:'and used a rotating cast of voices, tones, and long silences.', cls:''},
+      {text:'', cls:''},
+      {text:'Listeners who logged transmissions reported one recurring pattern:', cls:''},
+      {text:'every recording contained exactly one phrase that did not appear', cls:''},
+      {text:'in any other. No two archived transmissions are alike.', cls:''},
+      {text:'', cls:''},
+      {text:'The network ceased broadcasting in 2009.', cls:'dim'},
+      {text:'This terminal is the last surviving access point to its archive.', cls:'dim'}
+    ],
+    log: (args) => {
+      logAudio.currentTime = 0;
+      logAudio.play()
+        .then(()=>{ appendLine('[AUDIO: log.mp3 playing]', 'dim'); })
+        .catch((err)=>{ appendLine('[AUDIO ERROR: '+err.message+']', 'warn'); });
+      return args[0] ? logDetailLines(args[0]) : logIndexLines();
+    },
+    archive: (args) => commands.log(args),
+    decode: (args) => decodeLines(args[0]),
+    frequency: () => [
+      {text:'CURRENT LOCK: 6855 kHz', cls:'glow'},
+      {text:'SIGNAL STRENGTH: ▃▅▇█▆▄▂ (fluctuating)', cls:''},
+      {text:'LAST CARRIER DETECTED: 2009-04-30', cls:'dim'},
+      {text:'NODE 0 STATUS: DORMANT — LISTENING ONLY', cls:'dim'}
+    ],
+    freq: () => commands.frequency(),
+    whoami: () => [
+      {text:'OPERATOR ID: UNKNOWN', cls:''},
+      {text:'SESSION LOGGED AT '+new Date().toISOString(), cls:'dim'},
+      {text:'NODE 0 HAS RECORDED THIS VISIT.', cls:'warn'}
+    ],
+    exit: () => [{text:'THERE IS NO EXIT NODE. CONNECTION PERSISTS.', cls:'warn'}],
+    quit: () => commands.exit(),
+    callsign: (args) => {
+      if(args.length === 0){
+        return [{text:'CURRENT CALLSIGN: '+getCallsign(), cls:''}];
+      }
+      const result = setCallsign(args.join(' '));
+      if(!result) return [{text:'INVALID CALLSIGN.', cls:'warn'}];
+      return [{text:'CALLSIGN SET TO "'+result+'".', cls:'glow'}];
+    },
+    clear: () => { clearOutput(); return null; }
+  };
+
+  /* ---------------- input handling ---------------- */
+  const history = [];
+  let historyIndex = -1;
+
+  async function runCommand(raw){
+    const trimmed = raw.trim();
+    if(trimmed.length === 0) return;
+
+    appendLine('user@freq0:~$ ' + raw, 'echo');
+    history.push(raw);
+    historyIndex = history.length;
+
+    const lower = trimmed.toLowerCase();
+    if(lower === '0' || lower === 'zero'){
+      await runZeroEasterEgg();
+      return;
+    }
+
+    const parts = trimmed.split(/\s+/);
+    const name = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    if(name === 'listen'){
+      await runListen();
+      return;
+    }
+
+    if(name === 'transmit'){
+      await runTransmit(parts.slice(1).join(' '));
+      return;
+    }
+
+    if(name === 'inbox'){
+      await runInbox();
+      return;
+    }
+
+    if(Object.prototype.hasOwnProperty.call(commands, name)){
+      const result = commands[name](args);
+      if(result) printLines(result);
+      return;
+    }
+
+    appendLine(unknownReplies[Math.floor(Math.random()*unknownReplies.length)], 'warn');
+    appendLine('TYPE "help" FOR AVAILABLE COMMANDS.', 'dim');
+  }
+
+  hiddenInput.addEventListener('input', () => {
+    typedText.textContent = hiddenInput.value;
+  });
+
+  hiddenInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const val = hiddenInput.value;
+      hiddenInput.value = '';
+      typedText.textContent = '';
+      runCommand(val);
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault();
+      if(history.length === 0) return;
+      historyIndex = Math.max(0, historyIndex - 1);
+      hiddenInput.value = history[historyIndex] || '';
+      typedText.textContent = hiddenInput.value;
+    } else if(e.key === 'ArrowDown'){
+      e.preventDefault();
+      historyIndex = Math.min(history.length, historyIndex + 1);
+      hiddenInput.value = history[historyIndex] || '';
+      typedText.textContent = hiddenInput.value;
+    }
+  });
+
+  document.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click', () => {
+      hiddenInput.focus({preventScroll:true});
+      if(btn.dataset.prefill === 'true'){
+        hiddenInput.value = btn.dataset.cmd;
+        typedText.textContent = hiddenInput.value;
+        return;
+      }
+      runCommand(btn.dataset.cmd);
+    });
+  });
+
+  document.querySelector('.terminal').addEventListener('click', (e)=>{
+    if(e.target.closest('.chip')) return;
+    hiddenInput.focus({preventScroll:true});
+  });
+
+  runBoot();
+})();
+</script>
+</body>
+</html>
