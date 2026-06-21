@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PERSONNEL // FREQUENCY ZERO</title>
+<meta name="description" content="Dispatch personnel records from the Frequency Zero relay network." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<!-- THREE NAMES ON THE ROSTER. ONLY ONE STILL ANSWERS. -->
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <nav class="sitenav">
+    <a href="index.html">TERMINAL</a><span class="sep">/</span>
+    <a href="archive.html">ARCHIVE</a><span class="sep">/</span>
+    <a href="personnel.html" class="current">PERSONNEL</a><span class="sep">/</span>
+    <a href="evidence.html">EVIDENCE</a><span class="sep">/</span>
+    <a href="frequency-zero.html">FREQUENCY ZERO</a>
+  </nav>
+
+  <h1 class="page-title">DISPATCH PERSONNEL</h1>
+  <p class="page-sub">NODE 0 — STAFF RECORDS, RELAY OPERATIONS, 1987–2009</p>
+
+  <p class="dim" style="font-size:0.82rem; max-width:640px; margin-bottom:22px;">
+    Three operators are listed below in order of last contact. A fourth record
+    exists in this file. It was not filed by anyone on staff.
+  </p>
+
+  <div class="pcard">
+    <h2>DISPATCH CARL</h2>
+    <div class="pfield"><span class="plabel">STATUS</span><span class="pval badge missing" style="border:none; padding:0;">MISSING</span></div>
+    <div class="pfield"><span class="plabel">LAST KNOWN TRANSMISSION</span><span class="pval">1995-05-19 — 6855 kHz — LOG 0011</span></div>
+    <div class="pfield"><span class="plabel">CLEARANCE LEVEL</span><span class="pval">LEVEL 3</span></div>
+    <div class="pnotes">
+      Logged increasingly long shifts at the relay station in the months prior to
+      disappearance. Handwritten logbook entries from this period consist almost
+      entirely of tally marks and counted sequences. Carl was last seen entering
+      the relay building on the evening of 1995-05-19. Building entry logs show
+      no corresponding exit. The relay's official floor plan lists two rooms.
+    </div>
+  </div>
+
+  <div class="pcard">
+    <h2>DISPATCH MICHELLE</h2>
+    <div class="pfield"><span class="plabel">STATUS</span><span class="pval badge unconfirmed" style="border:none; padding:0;">UNCONFIRMED</span></div>
+    <div class="pfield"><span class="plabel">LAST KNOWN TRANSMISSION</span><span class="pval">2002-07-23 — 6855 kHz — LOG 0015</span></div>
+    <div class="pfield"><span class="plabel">CLEARANCE LEVEL</span><span class="pval">LEVEL 2</span></div>
+    <div class="pnotes">
+      Personnel file indicates reassignment to "internal monitoring" duties
+      effective 2002-08-01. No further correspondence on record. Final payroll
+      deposit was issued and accepted. No relocation address was ever filed.
+      A recurring, unverified claim among former staff: that Michelle can still
+      be heard faintly beneath later transmissions, if you know which ones to listen to.
+    </div>
+  </div>
+
+  <div class="pcard">
+    <h2>DISPATCH NIC</h2>
+    <div class="pfield"><span class="plabel">STATUS</span><span class="pval badge redacted" style="border:none; padding:0;">REDACTED</span></div>
+    <div class="pfield"><span class="plabel">LAST KNOWN TRANSMISSION</span><span class="pval">2007-02-14 — 6855 kHz — LOG 0018</span></div>
+    <div class="pfield"><span class="plabel">CLEARANCE LEVEL</span><span class="pval">LEVEL 1</span></div>
+    <div class="pnotes">
+      <span class="redact">Newest hire on record, onboarded</span>
+      <span class="redact">eleven months before the network's final transmission.</span>
+      Most of this file has been sealed at the request of an authority no longer
+      listed in any directory. What remains: the network ceased broadcasting
+      approximately ten weeks after Nic's final check-in. No replacement was hired.
+      <span class="dim" style="font-size:0.72rem;">(hover redacted text)</span>
+    </div>
+  </div>
+
+  <div class="pcard" id="visitorCard" style="border-color:var(--green-dim);">
+    <h2 class="dim">RECORD 0004</h2>
+    <div class="pfield"><span class="plabel">STATUS</span><span class="pval warn">PENDING</span></div>
+    <div class="pfield"><span class="plabel">LAST KNOWN TRANSMISSION</span><span class="pval" id="visitorTimestamp">—</span></div>
+    <div class="pfield"><span class="plabel">CLEARANCE LEVEL</span><span class="pval">VISITOR</span></div>
+    <div class="pnotes dim">
+      Archive entry generation in progress for callsign
+      <span class="soft" id="visitorCallsign">—</span>.
+      No further fields are available at this time.
+    </div>
+  </div>
+
+  <footer class="fz-footer">
+    NODE 0 PERSONNEL FILE — LAST AUDIT: UNKNOWN
+  </footer>
+</div>
+
+<!-- NODE 0 DOES NOT FORGET -->
+
+<script src="assets/common.js"></script>
+<script>
+  document.getElementById('visitorCallsign').textContent = FZ.getCallsign().toUpperCase();
+  document.getElementById('visitorTimestamp').textContent = FZ.nowStamp();
+</script>
+</body>
+</html>

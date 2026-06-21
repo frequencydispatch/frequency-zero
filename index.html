@@ -119,6 +119,23 @@
     letter-spacing:0.08em;
   }
 
+  .sitenav{
+    flex:none;
+    display:flex; flex-wrap:wrap; gap:4px 12px;
+    padding:4px 0 8px;
+    font-size:clamp(0.62rem,1.8vw,0.74rem);
+    letter-spacing:0.05em;
+  }
+  .sitenav a{
+    color:var(--green-dim); text-decoration:none;
+    border-bottom:1px solid transparent;
+    transition:color 0.15s, border-color 0.15s;
+  }
+  .sitenav a:hover, .sitenav a:focus-visible{
+    color:var(--green); border-color:var(--green-dim);
+  }
+  .sitenav .sep{ color:var(--green-faint); }
+
   .output{
     flex:1 1 auto;
     overflow-y:auto;
@@ -239,6 +256,14 @@
     <p>ARCHIVE TERMINAL — UNLICENSED RELAY, DECOMMISSIONED 2009</p>
   </div>
 
+  <!-- IF YOU ARE READING THIS YOU ARE PART OF THE LOG -->
+  <nav class="sitenav" aria-label="archive navigation">
+    <a href="archive.html">ARCHIVE</a><span class="sep">/</span>
+    <a href="personnel.html">PERSONNEL</a><span class="sep">/</span>
+    <a href="evidence.html">EVIDENCE</a><span class="sep">/</span>
+    <a href="frequency-zero.html">FREQUENCY ZERO</a>
+  </nav>
+
   <div class="output" id="output" role="log" aria-live="polite" aria-label="terminal output"></div>
 
   <div class="chips" aria-label="quick commands">
@@ -348,6 +373,7 @@
   tryPlayInitialContact();
 
   /* ---------------- boot sequence ---------------- */
+  // NODE 0 DOES NOT FORGET
   const bootLines = [
     {text:'INITIALIZING NODE 0 TERMINAL...', cls:'system'},
     {text:'CARRIER DETECTED ON LEGACY BAND...', cls:'system'},
@@ -720,7 +746,45 @@
       if(!result) return [{text:'INVALID CALLSIGN.', cls:'warn'}];
       return [{text:'CALLSIGN SET TO "'+result+'".', cls:'glow'}];
     },
-    clear: () => { clearOutput(); return null; }
+    clear: () => { clearOutput(); return null; },
+
+    /* ---- undocumented. not listed in help. ---- */
+    operator: () => [
+      {text:'OPERATOR LOG ACCESSED...', cls:'system'},
+      {text:'"THREE NAMES ON THE ROSTER. ONLY ONE STILL ANSWERS."', cls:'quote'},
+      {text:'FULL PERSONNEL RECORDS MAY BE FILED ELSEWHERE.', cls:'dim'}
+    ],
+    room3: () => [
+      {text:'...SEARCHING SEALED DIRECTORIES...', cls:'system'},
+      {text:'MATCH FOUND: CROSS-REFERENCE TO LOG 0001', cls:'dim'},
+      {text:'"THE THIRD ROOM HAS NO DOOR"', cls:'quote'},
+      {text:'A SEPARATE DOCUMENT EXISTS. IT WAS NEVER MEANT TO BE FOUND.', cls:'dim'},
+      {text:'PATH RECOVERED: /room3.html', cls:'warn'},
+      {text:'NODE 0 ADVISES AGAINST ACCESS.', cls:'dim'}
+    ],
+    relay: () => [
+      {text:'RELAY COORDINATES PARTIALLY RECOVERED.', cls:'system'},
+      {text:'TRANSMISSION POINT NEVER PUBLICLY CONFIRMED.', cls:'dim'},
+      {text:'PARTIAL FIELD DATA MAY EXIST ELSEWHERE IN THE ARCHIVE.', cls:'dim'}
+    ],
+    origin: () => [
+      {text:'ORIGIN QUERY: UNRESOLVED.', cls:'system'},
+      {text:'NETWORK FOUNDING LISTED AS 1987.', cls:'dim'},
+      {text:'EARLIEST RECOVERED LOG: 1988-06-02.', cls:'dim'},
+      {text:'DISCREPANCY UNEXPLAINED.', cls:'warn'}
+    ],
+    node0: () => [
+      {text:'NODE 0: ONLINE.', cls:'glow'},
+      {text:'NODE 0 DOES NOT TRANSMIT.', cls:'dim'},
+      {text:'NODE 0 RECEIVES.', cls:'dim'},
+      {text:'QUERY LOGGED.', cls:'dim'}
+    ],
+    channel7: () => [
+      {text:'CHANNEL 7 IS RESERVED.', cls:'system'},
+      {text:'NO BROADCAST HAS EVER OCCURRED ON CHANNEL 7.', cls:'dim'},
+      {text:'IT ONLY RECEIVES.', cls:'dim'},
+      {text:'TUNE IN. LISTEN LONGER THAN YOU THINK NECESSARY.', cls:'warn'}
+    ]
   };
 
   /* ---------------- input handling ---------------- */
@@ -815,5 +879,6 @@
   runBoot();
 })();
 </script>
+<!-- THEY NEVER FOUND THE THIRD ROOM -->
 </body>
 </html>

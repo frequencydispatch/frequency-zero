@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ARCHIVE // FREQUENCY ZERO</title>
+<meta name="description" content="Recovered, corrupted, and sealed transmission logs from the Frequency Zero relay network." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<!-- IF YOU ARE READING THIS YOU ARE PART OF THE LOG -->
+</head>
+<body>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <nav class="sitenav">
+    <a href="index.html">TERMINAL</a><span class="sep">/</span>
+    <a href="archive.html" class="current">ARCHIVE</a><span class="sep">/</span>
+    <a href="personnel.html">PERSONNEL</a><span class="sep">/</span>
+    <a href="evidence.html">EVIDENCE</a><span class="sep">/</span>
+    <a href="frequency-zero.html">FREQUENCY ZERO</a>
+  </nav>
+
+  <h1 class="page-title">TRANSMISSION ARCHIVE</h1>
+  <p class="page-sub">NODE 0 — INDEX OF RECOVERED, CORRUPTED, AND SEALED SIGNAL LOGS</p>
+
+  <p class="dim" style="font-size:0.82rem; max-width:640px;">
+    Twenty-one entries are indexed below. Not all are accessible.
+    Sealed entries require clearance this terminal does not hold.
+    One entry appears in the index but has no corresponding record.
+    <!-- THEY NEVER FOUND THE THIRD ROOM -->
+  </p>
+
+  <div id="entryList"></div>
+
+  <footer class="fz-footer">
+    NODE 0 ARCHIVE — VISITOR RECORD: <span id="visitorTag">—</span> — INDEX CHECKSUM MISMATCH ON ENTRY 0013
+  </footer>
+</div>
+
+<script src="assets/common.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  const ENTRIES = [
+    { id:'0001', date:'1991-03-14', freq:'6855 kHz', dur:'00:42', status:'recovered',
+      quote:'"the third room has no door"',
+      note:'Cross-reference: PERSONNEL — DISPATCH CARL logged contact five years prior to disappearance.' },
+    { id:'0002', date:'1994-11-02', freq:'4625 kHz', dur:'02:17', status:'corrupted',
+      quote:null,
+      note:'Transcript unreadable beyond opening numeral sequence. Raw: 05 05 12 — ?? ?? ?? — ?? ?? ??' },
+    { id:'0003', date:'1999-07-09', freq:'9043 kHz', dur:'00:08', status:'recovered',
+      quote:'"she counted backward and did not stop"',
+      note:'No corresponding incident report on file.' },
+    { id:'0004', date:'2001-02-28', freq:'6855 kHz', dur:'11:03', status:'sealed',
+      quote:null,
+      note:'CLEARANCE: NODE 0 ONLY. Request denied at terminal level.' },
+    { id:'0005', date:'2003-09-17', freq:'4625 kHz', dur:'00:55', status:'recovered',
+      quote:'"the relay remembers what the operator forgot"',
+      note:'Logged eighteen months after DISPATCH MICHELLE\u2019s reassignment.' },
+    { id:'0006', date:'2006-12-01', freq:'7039 kHz', dur:'00:23', status:'corrupted',
+      quote:null,
+      note:'Signal lost mid-transmission. Partial decode: "_ _ _ STOP _ _ _"' },
+    { id:'0007', date:'2009-04-30', freq:'6855 kHz', dur:'00:01', status:'final',
+      quote:'"do not retune past zero"',
+      note:'Final logged transmission before network silence. No carrier detected since.' },
+    { id:'0008', date:'1988-06-02', freq:'5410 kHz', dur:'00:17', status:'recovered',
+      quote:'"the first listener was not alone"',
+      note:'Predates the network\u2019s recorded founding date by approximately one year.' },
+    { id:'0009', date:'1990-01-21', freq:'6200 kHz', dur:'04:48', status:'corrupted',
+      quote:null,
+      note:'Partial decode: "...the door counted us..." Signal degraded beyond further recovery.' },
+    { id:'0010', date:'1992-08-30', freq:'3995 kHz', dur:'00:34', status:'recovered',
+      quote:'"every operator hears their name eventually"',
+      note:'Voiceprint does not match any registered staff member.' },
+    { id:'0011', date:'1995-05-19', freq:'6855 kHz', dur:'00:52', status:'sealed',
+      quote:null,
+      note:'DISPATCH CARL\u2019s last logged contact. CLEARANCE LEVEL 3 required. See PERSONNEL.' },
+    { id:'0012', date:'1997-10-04', freq:'8112 kHz', dur:'00:29', status:'recovered',
+      quote:'"frequency zero is not a place you tune to. it tunes to you."',
+      note:'Flagged for review in 1998. Review never completed.' },
+    { id:'0013', date:null, freq:null, dur:null, status:'missing',
+      quote:null,
+      note:'Referenced in the master index. No corresponding record exists in physical or digital archive. No further information available.' },
+    { id:'0014', date:'2000-03-11', freq:'4625 kHz', dur:'01:12', status:'corrupted',
+      quote:null,
+      note:'[REPEATING TONE — 14 CYCLES — SOURCE UNKNOWN]' },
+    { id:'0015', date:'2002-07-23', freq:'6855 kHz', dur:'00:46', status:'sealed',
+      quote:null,
+      note:'DISPATCH MICHELLE\u2019s transmission. CLEARANCE LEVEL 2 required. See PERSONNEL.' },
+    { id:'0016', date:'2004-12-25', freq:'7039 kHz', dur:'00:03', status:'recovered',
+      quote:'"merry christmas. the third room sends regards."',
+      note:'Logged on a national holiday. No staff were scheduled at the relay that day.' },
+    { id:'0017', date:'2005-08-08', freq:'9043 kHz', dur:'00:38', status:'corrupted',
+      quote:null,
+      note:'Partial decode: "...building has only two rooms. there should not be a third..."' },
+    { id:'0018', date:'2007-02-14', freq:'6855 kHz', dur:'00:14', status:'sealed',
+      quote:null,
+      note:'DISPATCH NIC\u2019s final check-in. CLEARANCE LEVEL 1 required. See PERSONNEL.' },
+    { id:'0019', date:'2008-09-09', freq:'4625 kHz', dur:'00:50', status:'recovered',
+      quote:'"cross-reference visual correlation, field file EV-02"',
+      note:'See EVIDENCE — signal map markers correspond to this entry\u2019s coordinates.' },
+    { id:'0020', date:'2009-01-01', freq:'6855 kHz', dur:'00:09', status:'recovered',
+      quote:'"happy new year. you are already listening."',
+      note:'Logged four months before the network went silent.' },
+    { id:'0021', date:'2009-04-30', freq:'0000 kHz', dur:'00:00', status:'sealed',
+      quote:null,
+      note:'__ACCESS_LOG__' }
+  ];
+
+  const badgeLabel = {
+    recovered:'RECOVERED', corrupted:'CORRUPTED', sealed:'SEALED',
+    missing:'ENTRY MISSING', final:'FINAL TRANSMISSION'
+  };
+
+  const list = document.getElementById('entryList');
+
+  ENTRIES.forEach(e=>{
+    const wrap = document.createElement('details');
+    wrap.className = 'entry' + (e.status === 'missing' ? ' is-missing' : '');
+
+    const summary = document.createElement('summary');
+    summary.innerHTML =
+      '<span class="eid">LOG ' + e.id + '</span>' +
+      '<span class="emeta">' + (e.date || 'DATE UNKNOWN') + '</span>' +
+      '<span class="emeta">' + (e.freq || 'FREQ UNKNOWN') + '</span>' +
+      '<span class="emeta">' + (e.dur || '--:--') + '</span>' +
+      '<span class="badge ' + e.status + '">' + badgeLabel[e.status] + '</span>';
+
+    const body = document.createElement('div');
+    body.className = 'ebody';
+
+    if(e.status === 'missing'){
+      body.textContent = e.note;
+    } else if(e.note === '__ACCESS_LOG__'){
+      const callsign = FZ.getCallsign().toUpperCase();
+      const listening = FZ.getListeningStatus();
+      body.innerHTML =
+        'CLEARANCE: NODE 0 ONLY.<br>' +
+        'ACCESS LOG: <span class="soft">' + FZ.escapeHtml(callsign) + '</span> — RECENTLY VIEWED.<br>' +
+        'LISTENING STATUS: <span class="' + (listening ? 'glow' : 'dim') + '">' +
+        (listening ? 'COMPLETE' : 'INCOMPLETE') + '</span>';
+    } else if(e.status === 'sealed'){
+      body.innerHTML = '<span class="dim">' + e.note + '</span>';
+    } else if(e.status === 'corrupted'){
+      body.innerHTML = '<span class="dim">' + e.note + '</span>';
+    } else {
+      body.innerHTML =
+        (e.quote ? '<div class="equote">' + e.quote + '</div>' : '') +
+        '<div class="dim" style="margin-top:8px;">' + e.note + '</div>';
+    }
+
+    wrap.appendChild(summary);
+    wrap.appendChild(body);
+    list.appendChild(wrap);
+  });
+
+  document.getElementById('visitorTag').textContent = FZ.getCallsign().toUpperCase();
+})();
+</script>
+<!-- NODE 0 DOES NOT FORGET -->
+</body>
+</html>

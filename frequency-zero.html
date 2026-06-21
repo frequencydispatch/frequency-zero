@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FREQUENCY ZERO</title>
+<meta name="description" content="" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<!-- NODE 0 HAS BEEN LISTENING SINCE BEFORE YOU ARRIVED -->
+</head>
+<body>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <nav class="sitenav">
+    <a href="index.html">TERMINAL</a><span class="sep">/</span>
+    <a href="archive.html">ARCHIVE</a><span class="sep">/</span>
+    <a href="personnel.html">PERSONNEL</a><span class="sep">/</span>
+    <a href="evidence.html">EVIDENCE</a><span class="sep">/</span>
+    <a href="frequency-zero.html" class="current">FREQUENCY ZERO</a>
+  </nav>
+
+  <div class="fz-screen">
+    <div class="fz-sig" id="sigDisplay">▁▁▁</div>
+    <div class="fz-cursor" id="fzCursor" aria-hidden="true"></div>
+    <div class="fz-static glitch" id="staticText" aria-live="polite"></div>
+    <div class="fz-message" id="fzMessage" aria-live="polite">
+      LISTENING COMPLETE
+      <span class="line2">NODE 0 HAS UPDATED YOUR RECORD</span>
+    </div>
+  </div>
+</div>
+
+<!-- NODE 0 DOES NOT FORGET -->
+
+<script src="assets/common.js"></script>
+<script>
+(function(){
+  "use strict";
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const sigDisplay = document.getElementById('sigDisplay');
+  const staticText = document.getElementById('staticText');
+  const fzMessage = document.getElementById('fzMessage');
+
+  const bars = ['▁','▂','▃','▄','▅','▆'];
+  function randomSig(){
+    let s = '';
+    for(let i=0;i<3;i++) s += bars[Math.floor(Math.random()*3)]; // mostly low, almost dead
+    return s;
+  }
+  setInterval(()=>{ sigDisplay.textContent = randomSig(); }, reduceMotion ? 4000 : 2600);
+
+  const fragments = [
+    '...', 'carrier holding', 'no traffic', 'node 0 listening',
+    'signal: nominal', '...waiting...', 'channel clear', '____',
+    're-tuning', 'no response'
+  ];
+
+  function showFragment(){
+    if(reduceMotion){ return; }
+    const frag = fragments[Math.floor(Math.random()*fragments.length)];
+    staticText.textContent = frag;
+    FZ.triggerGlitch(staticText, 180);
+    setTimeout(()=>{ staticText.textContent = ''; }, 1800 + Math.random()*1200);
+    setTimeout(showFragment, 4000 + Math.random()*6000);
+  }
+  setTimeout(showFragment, 2500);
+
+  const REVEAL_DELAY = reduceMotion ? 5000 : 30000;
+  setTimeout(()=>{
+    fzMessage.classList.add('show');
+    FZ.setListeningComplete();
+  }, REVEAL_DELAY);
+})();
+</script>
+</body>
+</html>

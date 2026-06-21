@@ -1,0 +1,286 @@
+/* FREQUENCY ZERO — shared visual system
+   Used by archive.html, personnel.html, room3.html, frequency-zero.html, evidence.html
+   Mirrors the CRT terminal aesthetic established in index.html */
+
+:root{
+  --bg:#060907;
+  --bg-alt:#0b1210;
+  --green:#3dff79;
+  --green-soft:#9dffc0;
+  --green-dim:#1d6b3d;
+  --green-faint:#0f3a22;
+  --amber:#ffb000;
+  --glow: rgba(61,255,121,0.45);
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --pixel: 'VT323', monospace;
+  --hand: 'Caveat', cursive;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  margin:0; padding:0;
+  background:var(--bg);
+  color:var(--green);
+  font-family:var(--mono);
+  -webkit-font-smoothing:antialiased;
+  min-height:100%;
+}
+body{ min-height:100vh; min-height:100dvh; }
+
+a{ color:var(--green-soft); }
+a:visited{ color:var(--green-soft); }
+
+/* ---------- CRT atmosphere ---------- */
+.crt-layer{ position:fixed; inset:0; pointer-events:none; z-index:30; }
+.crt-scanlines{
+  background:repeating-linear-gradient(
+    to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,20,8,0.35) 3px, rgba(0,0,0,0) 4px
+  );
+  mix-blend-mode:multiply; opacity:0.55;
+}
+.crt-vignette{
+  background:radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%);
+}
+.crt-noise{
+  opacity:0.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.crt-flicker{ animation:flicker 7s infinite linear; background:rgba(61,255,121,0.02); }
+@keyframes flicker{
+  0%,92%,100%{opacity:0;} 93%{opacity:1;} 94%{opacity:0;} 96%{opacity:0.6;} 97%{opacity:0;}
+}
+@keyframes blink{0%,49%{opacity:1;} 50%,100%{opacity:0;}}
+@media (prefers-reduced-motion: reduce){ .crt-flicker{animation:none; opacity:0;} }
+
+/* ---------- layout ---------- */
+.page-wrap{
+  position:relative; z-index:10;
+  max-width:980px; margin:0 auto;
+  padding:0 clamp(14px,3vw,28px) 60px;
+}
+
+.sitenav{
+  display:flex; flex-wrap:wrap; gap:4px 14px;
+  padding:14px 0 10px;
+  border-bottom:1px solid var(--green-faint);
+  font-size:clamp(0.66rem,2vw,0.78rem);
+  letter-spacing:0.05em;
+}
+.sitenav a{
+  color:var(--green-dim); text-decoration:none;
+  padding:2px 0; border-bottom:1px solid transparent;
+  transition:color 0.15s, border-color 0.15s;
+}
+.sitenav a:hover, .sitenav a:focus-visible{
+  color:var(--green); border-color:var(--green-dim);
+}
+.sitenav a.current{ color:var(--green-soft); }
+.sitenav .sep{ color:var(--green-faint); }
+
+.page-title{
+  font-family:var(--pixel); font-weight:400;
+  font-size:clamp(1.7rem,7vw,2.6rem);
+  letter-spacing:0.05em; margin:18px 0 2px;
+  color:var(--green);
+  text-shadow:0 0 12px var(--glow), 0 0 2px var(--green);
+}
+.page-sub{
+  margin:0 0 22px; font-size:clamp(0.68rem,2vw,0.82rem);
+  color:var(--green-dim); letter-spacing:0.07em;
+}
+
+.dim{ color:var(--green-dim); }
+.soft{ color:var(--green-soft); }
+.warn{ color:var(--amber); }
+.glow{ text-shadow:0 0 8px var(--glow); }
+.mono-block{ white-space:pre-wrap; word-break:break-word; line-height:1.55; }
+
+/* ---------- status badges ---------- */
+.badge{
+  display:inline-block; font-size:0.68rem; letter-spacing:0.06em;
+  padding:2px 8px; border:1px solid currentColor; border-radius:2px;
+  text-transform:uppercase;
+}
+.badge.recovered{ color:var(--green); }
+.badge.corrupted{ color:var(--amber); }
+.badge.sealed{ color:var(--green-dim); }
+.badge.missing{ color:var(--amber); opacity:0.7; text-decoration:line-through; }
+.badge.active{ color:var(--green); }
+.badge.unconfirmed{ color:var(--amber); }
+.badge.redacted{ color:var(--green-dim); }
+.badge.final{ color:var(--green-soft); }
+
+/* ---------- archive entries ---------- */
+.entry{
+  border:1px solid var(--green-faint); border-radius:3px;
+  margin-bottom:10px; overflow:hidden;
+}
+.entry summary{
+  list-style:none; cursor:pointer;
+  display:flex; flex-wrap:wrap; gap:6px 14px; align-items:baseline;
+  padding:10px 12px; font-size:0.82rem; letter-spacing:0.02em;
+}
+.entry summary::-webkit-details-marker{ display:none; }
+.entry summary .eid{ color:var(--green-soft); font-weight:600; }
+.entry summary .emeta{ color:var(--green-dim); font-size:0.76rem; }
+.entry[open] summary{ border-bottom:1px dashed var(--green-faint); }
+.entry .ebody{
+  padding:12px; font-size:0.84rem; line-height:1.6;
+}
+.entry .equote{ color:var(--green-soft); font-style:italic; }
+.entry.is-missing .ebody{ color:var(--green-dim); font-style:italic; }
+
+/* ---------- personnel cards ---------- */
+.pcard{
+  border:1px solid var(--green-faint); border-radius:3px;
+  padding:16px 18px; margin-bottom:16px;
+}
+.pcard h2{
+  font-family:var(--pixel); font-weight:400; font-size:1.6rem;
+  margin:0 0 8px; letter-spacing:0.04em; color:var(--green-soft);
+}
+.pfield{ display:flex; gap:10px; font-size:0.84rem; margin:4px 0; }
+.pfield .plabel{ color:var(--green-dim); min-width:170px; flex:none; }
+.pfield .pval{ color:var(--green); }
+.pnotes{
+  margin-top:10px; padding-top:10px; border-top:1px dashed var(--green-faint);
+  font-size:0.84rem; line-height:1.6; color:var(--green-soft);
+}
+
+.redact{
+  background:var(--green-faint); color:transparent;
+  border-radius:2px; padding:0 2px; cursor:default;
+  transition:color 0.4s, background 0.4s;
+}
+.redact:hover{ color:var(--green-dim); background:transparent; }
+
+/* ---------- classified document (room3) ---------- */
+.doc{
+  border:1px solid var(--green-dim); border-radius:2px;
+  padding:24px clamp(16px,4vw,32px); margin:24px 0;
+  background:var(--bg-alt);
+}
+.doc-header{
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;
+  font-size:0.72rem; color:var(--green-dim); letter-spacing:0.06em;
+  border-bottom:1px solid var(--green-faint); padding-bottom:10px; margin-bottom:16px;
+}
+.doc-stamp{
+  display:inline-block; border:2px solid var(--amber); color:var(--amber);
+  padding:6px 14px; font-family:var(--pixel); font-size:1.3rem;
+  letter-spacing:0.1em; transform:rotate(-3deg); margin:18px 0;
+}
+.doc p{ line-height:1.7; font-size:0.9rem; }
+.doc .gap{ color:var(--green-dim); letter-spacing:0.3em; }
+.doc .corrupt-block{
+  color:var(--green-dim); letter-spacing:0.15em; font-size:0.85rem;
+}
+
+/* ---------- frequency-zero minimal screen ---------- */
+.fz-screen{
+  min-height:80vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  gap:18px; padding:40px 16px;
+}
+.fz-sig{ font-size:1.4rem; letter-spacing:0.3em; color:var(--green-dim); }
+.fz-static{
+  font-size:0.7rem; color:var(--green-faint); letter-spacing:0.08em;
+  min-height:1.2em; max-width:480px;
+}
+.fz-cursor{
+  width:0.6em; height:1.2em; background:var(--green-dim);
+  animation:blink 1.2s steps(1) infinite;
+}
+.fz-message{
+  opacity:0; transition:opacity 2.5s ease;
+  font-family:var(--pixel); font-size:clamp(1.4rem,5vw,2.2rem);
+  color:var(--green); text-shadow:0 0 14px var(--glow);
+  letter-spacing:0.06em;
+}
+.fz-message.show{ opacity:1; }
+.fz-message .line2{
+  display:block; font-size:0.55em; color:var(--green-soft); margin-top:8px;
+  font-family:var(--mono); letter-spacing:0.1em;
+}
+@media (prefers-reduced-motion: reduce){
+  .fz-cursor{ animation:none; }
+}
+
+/* ---------- evidence page ---------- */
+.evidence-grid{ display:flex; flex-direction:column; gap:26px; }
+.ev-section h2{
+  font-family:var(--pixel); font-weight:400; font-size:1.5rem;
+  letter-spacing:0.04em; color:var(--green-soft); margin:0 0 12px;
+  border-bottom:1px dashed var(--green-faint); padding-bottom:6px;
+}
+.ev-cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+.ev-card{
+  border:1px solid var(--green-faint); border-radius:3px; padding:12px 14px;
+  font-size:0.82rem; line-height:1.5;
+}
+.ev-card .ev-tag{ color:var(--green-dim); font-size:0.68rem; letter-spacing:0.07em; display:block; margin-bottom:6px; }
+
+.map-box{
+  position:relative; border:1px solid var(--green-faint); border-radius:3px;
+  height:240px; background:
+    linear-gradient(var(--green-faint) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg, var(--green-faint) 1px, transparent 1px) 0 0/40px 40px,
+    var(--bg-alt);
+  overflow:hidden;
+}
+.map-pin{
+  position:absolute; width:8px; height:8px; border-radius:50%;
+  background:var(--green); box-shadow:0 0 10px var(--glow);
+}
+.map-pin::after{
+  content:attr(data-label); position:absolute; top:12px; left:50%;
+  transform:translateX(-50%); white-space:nowrap; font-size:0.65rem;
+  color:var(--green-dim);
+}
+.map-pin.unconfirmed{ background:var(--amber); box-shadow:0 0 10px rgba(255,176,0,0.4); }
+
+.note{
+  font-family:var(--hand); font-size:1.4rem; color:var(--green-soft);
+  border:1px solid var(--green-faint); border-radius:2px; padding:14px 18px;
+  background:var(--bg-alt); transform:rotate(var(--rot,-1deg));
+  line-height:1.4;
+}
+.note .note-tag{
+  display:block; font-family:var(--mono); font-size:0.65rem;
+  color:var(--green-dim); margin-bottom:6px; letter-spacing:0.06em;
+}
+
+.chart{
+  display:flex; align-items:flex-end; gap:6px; height:140px;
+  border-bottom:1px solid var(--green-faint); padding:0 4px;
+}
+.chart .bar{
+  flex:1; background:linear-gradient(to top, var(--green-faint), var(--green-dim));
+  position:relative; min-width:6px; border-radius:2px 2px 0 0;
+}
+.chart .bar .yr{
+  position:absolute; bottom:-20px; left:50%; transform:translateX(-50%);
+  font-size:0.6rem; color:var(--green-dim);
+}
+
+.redacted-block{
+  border:1px solid var(--green-faint); border-radius:3px; padding:14px 16px;
+  font-size:0.84rem; line-height:1.8;
+}
+
+/* ---------- glitch text ---------- */
+.glitch{ position:relative; display:inline-block; }
+.glitch.active{ animation:glitchShift 0.18s linear; }
+@keyframes glitchShift{
+  0%{ transform:translate(0,0); opacity:1; }
+  20%{ transform:translate(-2px,1px); opacity:0.7; }
+  40%{ transform:translate(2px,-1px); opacity:0.9; }
+  60%{ transform:translate(-1px,0); opacity:0.6; }
+  100%{ transform:translate(0,0); opacity:1; }
+}
+
+footer.fz-footer{
+  margin-top:30px; padding-top:14px; border-top:1px solid var(--green-faint);
+  font-size:0.68rem; color:var(--green-faint); letter-spacing:0.08em;
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EVIDENCE // FREQUENCY ZERO</title>
+<meta name="description" content="Field evidence collected in relation to the Frequency Zero relay network." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<!-- THE MAP IS NOT TO SCALE. IT WAS NEVER MEANT TO BE FOLLOWED. -->
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <nav class="sitenav">
+    <a href="index.html">TERMINAL</a><span class="sep">/</span>
+    <a href="archive.html">ARCHIVE</a><span class="sep">/</span>
+    <a href="personnel.html">PERSONNEL</a><span class="sep">/</span>
+    <a href="evidence.html" class="current">EVIDENCE</a><span class="sep">/</span>
+    <a href="frequency-zero.html">FREQUENCY ZERO</a>
+  </nav>
+
+  <h1 class="page-title">FIELD EVIDENCE</h1>
+  <p class="page-sub">UNVERIFIED — COMPILED FROM MULTIPLE SOURCES, NO SINGLE AUTHOR CONFIRMED</p>
+
+  <div class="evidence-grid">
+
+    <section class="ev-section">
+      <h2>SIGNAL MAP</h2>
+      <div class="map-box" id="mapBox">
+        <div class="map-pin" style="top:28%; left:34%;" data-label="RELAY POINT"></div>
+        <div class="map-pin unconfirmed" style="top:55%; left:62%;" data-label="REPEATER B — UNCONFIRMED"></div>
+        <div class="map-pin" style="top:70%; left:20%;" data-label="LISTENING POST"></div>
+        <div class="map-pin unconfirmed" style="top:18%; left:74%;" data-label="EV-02 — SEE LOG 0019"></div>
+      </div>
+      <p class="dim" style="font-size:0.72rem; margin-top:8px;">Grid coordinates withheld from public release. Marker positions approximate.</p>
+    </section>
+
+    <section class="ev-section">
+      <h2>FIELD NOTES</h2>
+      <div class="ev-cards">
+        <div class="note" style="--rot:-1.5deg;">
+          <span class="note-tag">FOUND TAPED TO RELAY DOOR — UNDATED</span>
+          don't go in after dark. count the rooms before you start your shift. if it's three, leave.
+        </div>
+        <div class="note" style="--rot:1deg;">
+          <span class="note-tag">HANDWRITING MATCHED TO PERSONNEL FILE — C.</span>
+          told M. about the door. she said I imagined it. I didn't imagine it twice.
+        </div>
+        <div class="note" style="--rot:-0.5deg;">
+          <span class="note-tag">RECOVERED FROM DESK, 2002 — UNSIGNED</span>
+          if you're reading this and you're not me, the shift schedule is wrong. there were never supposed to be three of us.
+        </div>
+      </div>
+    </section>
+
+    <section class="ev-section">
+      <h2>TRANSMISSION FRAGMENTS</h2>
+      <div class="ev-cards">
+        <div class="ev-card"><span class="ev-tag">FRAG — 1993, UNLOGGED</span>"...if anyone is receiving, the count is wrong, the count has always been wrong..."</div>
+        <div class="ev-card"><span class="ev-tag">FRAG — 1998, UNLOGGED</span>"...not asking you to find it. asking you to stop listening for it..."</div>
+        <div class="ev-card"><span class="ev-tag">FRAG — 2004, UNLOGGED</span>"...the relay doesn't need an operator anymore. it never really did..."</div>
+        <div class="ev-card"><span class="ev-tag">FRAG — 2009, UNLOGGED</span>"...thank you for listening. that's all it ever wanted..."</div>
+      </div>
+    </section>
+
+    <section class="ev-section">
+      <h2>FREQUENCY ACTIVITY</h2>
+      <div class="chart" id="chart"></div>
+      <p class="dim" style="font-size:0.72rem; margin-top:26px;">Logged transmission volume by year, recovered entries only. Gaps do not indicate silence.</p>
+    </section>
+
+    <section class="ev-section">
+      <h2>REDACTED FILES</h2>
+      <div class="redacted-block">
+        MEMO — INTERNAL DISTRIBUTION ONLY<br>
+        RE: <span class="redact">RELAY STAFFING SHORTAGE</span><br><br>
+        Following the <span class="redact">disappearance of DISPATCH CARL</span>, staffing
+        at the relay has become <span class="redact">difficult to maintain</span>. Two
+        replacement candidates withdrew their applications after
+        <span class="redact">touring the facility</span>. Recommend the network
+        <span class="redact">continue operating with reduced or no on-site staff</span>,
+        as transmission activity has shown <span class="redact">no measurable change</span>
+        in operator absence.
+        <p class="dim" style="font-size:0.7rem; margin-top:10px;">(hover redacted text)</p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="fz-footer">
+    EVIDENCE COMPILED BY: UNKNOWN — VISITOR RECORD: <span id="visitorTag">—</span>
+  </footer>
+</div>
+
+<!-- NODE 0 DOES NOT FORGET -->
+<!-- THEY NEVER FOUND THE THIRD ROOM -->
+
+<script src="assets/common.js"></script>
+<script>
+(function(){
+  const data = [
+    {yr:1988, v:14}, {yr:1991, v:22}, {yr:1995, v:31}, {yr:1999, v:18},
+    {yr:2002, v:27}, {yr:2005, v:12}, {yr:2007, v:8}, {yr:2009, v:3}
+  ];
+  const max = Math.max(...data.map(d=>d.v));
+  const chart = document.getElementById('chart');
+  data.forEach(d=>{
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = Math.max(6, Math.round((d.v/max)*120)) + 'px';
+    bar.innerHTML = '<span class="yr">' + d.yr + '</span>';
+    chart.appendChild(bar);
+  });
+  document.getElementById('visitorTag').textContent = FZ.getCallsign().toUpperCase();
+})();
+</script>
+</body>
+</html>
