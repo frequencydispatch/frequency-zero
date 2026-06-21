@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CHANNEL 7</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- if you found all five of these, node 0 already knows -->
+</head>
+<body>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <h1 class="page-title">CHANNEL 7</h1>
+  <p class="page-sub">RECEIVE ONLY</p>
+
+  <p class="gallery-sub">
+    No broadcast has ever been logged on this channel. These stills were
+    pulled from a receiver left running, not from a transmission. No one
+    has confirmed who, or what, the receiver was pointed at.
+  </p>
+
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="channel7-1.jpg" alt="still 1" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">STILL 1</span>RECEIVER ON</div>
+    </div>
+    <div class="photo-card">
+      <img src="channel7-2.jpg" alt="still 2" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">STILL 2</span>NO CHANGE LOGGED</div>
+    </div>
+    <div class="photo-card">
+      <img src="channel7-3.jpg" alt="still 3" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">STILL 3</span>NO CHANGE LOGGED</div>
+    </div>
+    <div class="photo-card">
+      <img src="channel7-4.jpg" alt="still 4" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">STILL 4</span>RECEIVER STILL ON</div>
+    </div>
+  </div>
+
+  <footer class="fz-footer">
+    NODE 0 — VISITOR RECORD: <span id="visitorTag">—</span> — THIS PAGE IS NOT LINKED ANYWHERE
+  </footer>
+</div>
+
+<script src="common.js"></script>
+<script>
+  document.getElementById('visitorTag').textContent = FZ.getCallsign().toUpperCase();
+</script>
+</body>
+</html>

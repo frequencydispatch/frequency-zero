@@ -49,8 +49,19 @@
     setTimeout(()=>el.classList.remove('active'), duration || 200);
   }
 
+  function imgFallback(imgEl){
+    imgEl.onerror = null;
+    imgEl.src = "data:image/svg+xml;utf8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">' +
+      '<rect width="100%" height="100%" fill="#0b1210"/>' +
+      '<text x="50%" y="50%" fill="#1d6b3d" font-family="monospace" font-size="20" text-anchor="middle" dominant-baseline="middle">NO SIGNAL</text>' +
+      '</svg>'
+    );
+    imgEl.classList.add('missing-img');
+  }
+
   window.FZ = {
     getCallsign, setListeningComplete, getListeningStatus,
-    escapeHtml, nowStamp, triggerGlitch
+    escapeHtml, nowStamp, triggerGlitch, imgFallback
   };
 })(window);

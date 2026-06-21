@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CORRIDOR B</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- there is no corridor A on file -->
+</head>
+<body>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <h1 class="page-title">CORRIDOR B</h1>
+  <p class="page-sub">DOES NOT APPEAR ON ANY FLOOR PLAN</p>
+
+  <p class="gallery-sub">
+    Referenced in three unrelated reports as "corridor B." No corridor A
+    has ever been logged, named, or photographed. These frames are the
+    only documentation that the corridor exists at all.
+  </p>
+
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="corridor-b-1.jpg" alt="frame 1" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">FRAME 1</span>ENTRY POINT, UNCONFIRMED</div>
+    </div>
+    <div class="photo-card">
+      <img src="corridor-b-2.jpg" alt="frame 2" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">FRAME 2</span>MIDPOINT, ESTIMATED</div>
+    </div>
+    <div class="photo-card">
+      <img src="corridor-b-3.jpg" alt="frame 3" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">FRAME 3</span>SAME AS FRAME 1, DIFFERENT DATE</div>
+    </div>
+    <div class="photo-card">
+      <img src="corridor-b-4.jpg" alt="frame 4" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">FRAME 4</span>END NOT REACHED</div>
+    </div>
+  </div>
+
+  <footer class="fz-footer">
+    NODE 0 — VISITOR RECORD: <span id="visitorTag">—</span> — THIS PAGE IS NOT LINKED ANYWHERE
+  </footer>
+</div>
+
+<!-- threshold.html is the last one we're sure about -->
+
+<script src="common.js"></script>
+<script>
+  document.getElementById('visitorTag').textContent = FZ.getCallsign().toUpperCase();
+</script>
+</body>
+</html>

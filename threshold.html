@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>THRESHOLD</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- a threshold implies two sides. only one was ever documented. -->
+</head>
+<body>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <h1 class="page-title">THRESHOLD</h1>
+  <p class="page-sub">LAST KNOWN BOUNDARY</p>
+
+  <p class="gallery-sub">
+    Filed as the final set before contact with whoever was documenting
+    these was lost. Captions are theirs, not ours. We left them as written.
+  </p>
+
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="threshold-1.jpg" alt="before" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">BEFORE</span>WRITTEN ON THE BACK, NOT TYPED</div>
+    </div>
+    <div class="photo-card">
+      <img src="threshold-2.jpg" alt="during" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">DURING</span>NO FURTHER LABEL</div>
+    </div>
+    <div class="photo-card">
+      <img src="threshold-3.jpg" alt="after" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">AFTER</span>HANDWRITING CHANGES HERE</div>
+    </div>
+    <div class="photo-card">
+      <img src="threshold-4.jpg" alt="unlabeled" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">UNLABELED</span>FOUND LOOSE, NOT WITH THE SET</div>
+    </div>
+  </div>
+
+  <footer class="fz-footer">
+    NODE 0 — VISITOR RECORD: <span id="visitorTag">—</span> — THIS PAGE IS NOT LINKED ANYWHERE
+  </footer>
+</div>
+
+<!-- channel7.html receives. it does not explain. -->
+
+<script src="common.js"></script>
+<script>
+  document.getElementById('visitorTag').textContent = FZ.getCallsign().toUpperCase();
+</script>
+</body>
+</html>

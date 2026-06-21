@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SUBLEVEL</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- depth was never measured. only estimated. -->
+</head>
+<body>
+
+<div class="crt-layer crt-noise"></div>
+<div class="crt-layer crt-scanlines"></div>
+<div class="crt-layer crt-flicker"></div>
+<div class="crt-layer crt-vignette"></div>
+
+<div class="page-wrap">
+  <h1 class="page-title">SUBLEVEL</h1>
+  <p class="page-sub">DEPTH UNCONFIRMED</p>
+
+  <p class="gallery-sub">
+    No structure on record extends below ground level. These were filed
+    under "sublevel" regardless. Order is approximate. Direction of travel
+    between frames could not be determined.
+  </p>
+
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="sublevel-1.jpg" alt="descent 1" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">DESCENT 1</span>FIRST OF FOUR</div>
+    </div>
+    <div class="photo-card">
+      <img src="sublevel-2.jpg" alt="descent 2" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">DESCENT 2</span>LIGHT SOURCE UNCLEAR</div>
+    </div>
+    <div class="photo-card">
+      <img src="sublevel-3.jpg" alt="descent 3" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">DESCENT 3</span>SAME HALLWAY AS FRAME 1</div>
+    </div>
+    <div class="photo-card">
+      <img src="sublevel-4.jpg" alt="descent 4" onerror="FZ.imgFallback(this)">
+      <div class="photo-cap"><span class="pc-label">DESCENT 4</span>LAST FRAME ON THIS ROLL</div>
+    </div>
+  </div>
+
+  <footer class="fz-footer">
+    NODE 0 — VISITOR RECORD: <span id="visitorTag">—</span> — THIS PAGE IS NOT LINKED ANYWHERE
+  </footer>
+</div>
+
+<!-- corridor-b.html continues from here, if it continues at all -->
+
+<script src="common.js"></script>
+<script>
+  document.getElementById('visitorTag').textContent = FZ.getCallsign().toUpperCase();
+</script>
+</body>
+</html>
