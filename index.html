@@ -275,6 +275,7 @@
     <button class="chip" data-cmd="frequency">frequency</button>
     <button class="chip" data-cmd="transmit " data-prefill="true">transmit</button>
     <button class="chip" data-cmd="inbox">inbox</button>
+    <a class="chip" href="tel:+17133960377" style="text-decoration:none;">&#9742; CONTACT NODE 0</a>
   </div>
 
   <div class="prompt-line" id="promptLine">
@@ -778,6 +779,12 @@
       {text:'NODE 0 DOES NOT TRANSMIT.', cls:'dim'},
       {text:'NODE 0 RECEIVES.', cls:'dim'},
       {text:'QUERY LOGGED.', cls:'dim'}
+    ],
+    contact: () => [
+      {text:'OPEN CHANNEL DETECTED.', cls:'system'},
+      {text:'VOICE LINE: +1 (713) 396-0377', cls:'glow'},
+      {text:'LEAVE A TRANSMISSION. NODE 0 IS LISTENING.', cls:'dim'},
+      {text:'ALL MESSAGES ARE ARCHIVED.', cls:'dim'}
     ],
     archive7: () => [
       {text:'QUERYING UNINDEXED STORAGE...', cls:'system'},
